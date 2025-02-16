@@ -1,6 +1,8 @@
 <?php require "header.php"; ?>
 <?php require "validation.php"; ?>
 <?php 
+// セッション開始 セッション：Webサイトにアクセスしてから離脱するまでの通信の単位
+session_start();
 
 // ページフラッグ
 $pageFlag = 0;
@@ -13,8 +15,17 @@ if(isset($_POST['confirm'])){
     $error_msg = validation($_POST);
 }
 
+// 確認画面から入力画面に戻ってきた場合、または初回表示時用にセッションから値を取得する
+$name  = isset($_SESSION['input_data']['name']) ? $_SESSION['input_data']['name'] : '';
+$price = isset($_SESSION['input_data']['price']) ? $_SESSION['input_data']['price'] : '';
+
+// セッションに保存した入力データを削除
+unset($_SESSION['input_data']);
+
+// 入力画面から登録ボタンが押され、エラーがなければ確認画面へ
 if(isset($_POST['confirm']) && empty($error_msg)){
-    // 入力画面でエラーがなければ確認画面へ
+    // 遷移の際、セッションに入力データを保存
+    $_SESSION['input_data'] = $_POST;
     $pageFlag = 1;
 }else if(!empty($_POST['submit'])){
     // 確認画面で問題なければ完了画面へ
@@ -22,7 +33,6 @@ if(isset($_POST['confirm']) && empty($error_msg)){
 }
 
 if($pageFlag == 2){
-    var_dump($_POST);
     // DB接続し、追加処理
     $pdo = new PDO('mysql:host=localhost;dbname=practicePHP;charset=utf8','staff','password');
     $sql = $pdo->prepare('insert into product values(null, ?, ?)');
@@ -34,11 +44,11 @@ if($pageFlag == 2){
 <?php if($pageFlag === 0) : ?>
     <h1>商品新規登録</h1>
     <form action="input.php" method="post">
-        <p>商品名：<input type="text" name="name" value="<?php if(isset($_POST['name'])){ echo $_POST['name']; } ?>"></p>
+        <p>商品名：<input type="text" name="name" value="<?php echo $name; ?>"></p>
         <p class="error-message"><?php if(isset($error_msg['name'])) echo($error_msg['name']); ?></p>
-        <p>価格：<input type="text" name="price" value="<?php if(isset($_POST['price'])){ echo $_POST['price']; } ?>"></p>
+        <p>価格：<input type="text" name="price" value="<?php echo $price; ?>"></p>
         <p class="error-message"><?php if(isset($error_msg['price'])) echo($error_msg['price']); ?></p>
-        <input type="submit" name="confirm" value="登録">
+        <input type="submit" name="confirm" value="確認">
     </form>
 <?php endif; ?>
 
@@ -50,7 +60,7 @@ if($pageFlag == 2){
         価格：<?php echo $_POST['price']; ?>円<br>
 
         <input type="submit" name="back" value="戻る">
-        <input type="submit" name="submit" value="送信する">
+        <input type="submit" name="submit" value="登録">
 
         <input type="hidden" name="name" value="<?php echo($_POST['name']) ;?>">
         <input type="hidden" name="price" value="<?php echo($_POST['price']) ;?>">

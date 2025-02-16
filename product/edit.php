@@ -1,6 +1,6 @@
 <?php require "header.php"; ?>
 <?php require "validation.php"; ?>
-<?php 
+<?php
 
 // ページフラッグ
 $pageFlag = 0;
@@ -27,7 +27,6 @@ if($pageFlag == 0){
     $sql = $pdo->prepare("select * from product where id = ?");
     $sql->execute([$_GET['id']]);
     $record = $sql->fetch(PDO::FETCH_ASSOC); // 返された際のカラム名で添字を付けた配列を返す
-    var_dump($record);
 
     $id    = $record['id'];
     $name  = (isset($_POST['name'])) ? $_POST['name'] : $record['name'];
@@ -35,7 +34,6 @@ if($pageFlag == 0){
 }
 
 if($pageFlag == 2){
-    var_dump($_POST);
     // 更新
     $sql = $pdo->prepare('UPDATE product SET name = ?, price = ? WHERE id = ?');
     $sql->execute([$_POST['name'], $_POST['price'], $_POST['id']]);
@@ -50,7 +48,7 @@ if($pageFlag == 2){
         <p class="error-message"><?php if(isset($error_msg['name'])) echo($error_msg['name']); ?></p>
         <p>価格：<input type="text" name="price" value="<?php echo($price); ?>"></p>
         <p class="error-message"><?php if(isset($error_msg['price'])) echo($error_msg['price']); ?></p>
-        <input type="submit" name="confirm" value="登録">
+        <input type="submit" name="confirm" value="確認">
 
         <input type="hidden" name="id" value="<?php echo($id) ;?>">
     </form>
@@ -64,7 +62,7 @@ if($pageFlag == 2){
         価格：<?php echo $_POST['price']; ?>円<br>
 
         <button><a href="edit.php?id=<?php echo $_POST['id']; ?>">戻る</a></button>
-        <input type="submit" name="submit" value="送信する">
+        <input type="submit" name="submit" value="更新">
 
         <input type="hidden" name="id" value="<?php echo($_POST['id']) ;?>">
         <input type="hidden" name="name" value="<?php echo($_POST['name']) ;?>">
